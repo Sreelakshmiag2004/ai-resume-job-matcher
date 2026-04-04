@@ -1,12 +1,11 @@
 import os
 import pandas as pd
-import sys  # FIXED: Moved to TOP level
+import sys
 
 from resume_parser import extract_resume_text
 from jobs_loader import load_jobs
 from matcher import rank_jobs_by_similarity
 from whatsapp_notifier import send_whatsapp_message
-
 
 def validate_csv(csv_path):
     if not os.path.exists(csv_path):
@@ -15,7 +14,6 @@ def validate_csv(csv_path):
 
     try:
         df = pd.read_csv(csv_path)
-
         if df.empty:
             print("❌ CSV is empty")
             return False
@@ -34,9 +32,7 @@ def validate_csv(csv_path):
         print(f"❌ Error reading CSV: {e}")
         return False
 
-
 def main():
-    # Command line argument support (NOW WORKS!)
     if len(sys.argv) > 1:
         resume_path = sys.argv[1]
         print(f"🎯 Using command line resume: {resume_path}")
@@ -66,8 +62,19 @@ def main():
     
     print(f"\n📝 Resume extraction results:")
     print(f"   Text length: {len(resume_text)} characters")
-    print(f"   First 300 chars: {repr(resume_text[:300])}")
-    print(f"   Preview: {resume_text[:100]}...")
+    print(f"   Preview: {resume_text[:200]}...")
+
+    # *** KEYWORD DEBUG ***
+    print("\n🔍 RESUME KEYWORDS DEBUG:")
+    resume_lower = resume_text.lower()
+    devops_kws = ["docker", "kubernetes", "aws", "linux", "cloud", "devops"]
+    frontend_kws = ["react", "javascript", "frontend", "html", "css"]
+    
+    devops_found = [kw for kw in devops_kws if kw in resume_lower]
+    frontend_found = [kw for kw in frontend_kws if kw in resume_lower]
+    
+    print(f"   DevOps keywords found: {devops_found}")
+    print(f"   Frontend keywords found: {frontend_found}")
 
     print("\n⚙️ Loading jobs...")
     jobs_df = load_jobs(jobs_path)
@@ -104,7 +111,6 @@ def main():
         print("-" * 60)
 
     print("\n✅ Pipeline complete! CSV validated. Ready for WhatsApp (disabled).")
-
 
 if __name__ == "__main__":
     main()
